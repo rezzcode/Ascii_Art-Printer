@@ -3,6 +3,7 @@ package print
 import (
 	"fmt"
 	"strings"
+	"log"
 )
 
 func indexToPrint(r rune) int {
@@ -12,6 +13,12 @@ func indexToPrint(r rune) int {
 func AsciiArt(data string, dataList [][][]rune) string {
 	data = strings.ReplaceAll(data, "\\n", "\n")
 	lines := strings.Split(data, "\n")
+
+	if len(dataList) == 0 {
+    log.Fatal("ERROR: dataList is empty. Cannot generate ASCII art.")
+}
+
+	
 	height := len(dataList[0])
 	res := ""
 
@@ -32,7 +39,7 @@ func AsciiArt(data string, dataList [][][]rune) string {
 		}
 
 		for _, row := range rows {
-			// fmt.Println(string(row)) uncomment to print to the terminal
+			fmt.Println(string(row))
 			res += string(row) + "\n"
 		}
 		/**

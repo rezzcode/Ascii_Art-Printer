@@ -16,7 +16,12 @@ type asciiRequest struct {
 }
 
 func asciiWeb(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "../frontend/index.html")
+	filePath := "../frontend/index.html"
+	http.ServeFile(w, r, filePath)
+	if r.URL.Path != "/" || r.Method != http.MethodGet {
+		log.Println("ERROR: file not found, Status code:", http.StatusNotFound)
+		return
+	}
 }
 
 func testHandler(w http.ResponseWriter, r *http.Request) {

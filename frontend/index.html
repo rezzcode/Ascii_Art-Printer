@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ASCII Art Generator</title>
+  </head>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Courier New", Courier, monospace;
+    }
+
+    body {
+      background: linear-gradient(135deg, #6b73ff, #000dff);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding: 50px 20px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+      text-align: center;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+      width: 100%;
+      max-width: 600px;
+    }
+
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 12px 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+    }
+
+    select {
+      background-color: #fff;
+      color: #000;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px 15px;
+      font-size: 1.1rem;
+      background: #ff5f6d;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background: #ffc371;
+      color: #000;
+    }
+
+    pre#output {
+      background: rgba(0, 0, 0, 0.7);
+      color: #0f0;
+      white-space: pre-wrap;
+      overflow: hidden; /* hide scrollbar initially */
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      margin-top: 20px;
+      transition: max-height 0.3s ease;
+    }
+
+    @media (max-width: 500px) {
+      .container {
+        padding: 20px;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+  <body>
+    <div class="container">
+      <input id="charInput" type="text" placeholder="Enter character(s)" />
+      <select id="fontSelect">
+        <option value="standard.txt">Standard</option>
+        <option value="thinker-toy.txt">Thinkertoy</option>
+        <option value="shadow.txt">Shadow</option>
+      </select>
+      <button onclick="generate()">Generate ASCII Art</button>
+      <pre id="output"></pre>
+    </div>
+    <script>
+      async function generate() {
+        const data = document.getElementById("charInput").value;
+        const font = document.getElementById("fontSelect").value;
+
+        try {
+          const res = await fetch("http://localhost:8000/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: data, font }),
+          });
+
+          if (!res.ok) {
+            // If server returned an error, read it as text
+            const errorText = await res.text();
+            document.getElementById("output").textContent =
+              "Error: " + errorText;
+            return;
+          }
+
+          const json = await res.json();
+          document.getElementById("output").textContent = json.message;
+        } catch (err) {
+          document.getElementById("output").textContent = "Fetch error: " + err;
+        }
+      }
+    </script>
+  </body>
+</html>

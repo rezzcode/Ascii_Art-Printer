@@ -1,10 +1,8 @@
 package main
 
 import (
-	"fmt"
-
-	//"strconv"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -12,21 +10,9 @@ import (
 	"ascii_art/Lib/process"
 )
 
-/*
-
-func errorCheck(err error) {
-	if err != nil {
-		log.Fatal("ERROR:	", err)
-	}
-}
-*/
-
-func stringCheck(s string) {
-	if s == "" {
-		log.Fatal("ERROR:		input string is empty")
-		return
-	}
-	log.Println("INFO:		input string is valid")
+type asciiRequest struct {
+	Text   string `json:"text"`
+	Format string `json:"format"`
 }
 
 func asciiWeb(w http.ResponseWriter, r *http.Request) {
@@ -34,40 +20,49 @@ func asciiWeb(w http.ResponseWriter, r *http.Request) {
 }
 
 func testHandler(w http.ResponseWriter, r *http.Request) {
-	/*
-		input := os.Args
+	w.Header().Set("Content-Type", "application/json")
 
-		fileName, data, err := check.Args(input)
+	var req asciiRequest
 
-		if !err {
-			fmt.Println(data)
+	if r.Method == http.MethodPost {
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid JSON body"})
+			log.Println("ERROR: invalid JSON body:", err, "Status code:", http.StatusBadRequest)
 			return
 		}
-	*/
-	// still needs to be tested with a [[[],[]],[[],[]]]
-	data := "T"
+	} else {
+		// Allow simple GET fallback via query params: /test?text=Hi&format=standard.txt
+		req.Text = r.URL.Query().Get("text")
+		req.Format = r.URL.Query().Get("format")
+	}
 
-	// check if string is empty
-	stringCheck(data)
+	if req.Text == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "text is required"})
+		log.Println("ERROR: text is required, Status code:", http.StatusBadRequest)
+		return
+	}
 
-	// choose print format
+	if req.Format == "" {
+		req.Format = "standard.txt"
+	}
 
-	printFormat := process.Wrapper("standard.txt")
+	log.Println("OPTIONS: received request", "text = ", req.Text, "format = ", req.Format)
 
-	// printFormat := process.Wrapper(fileName)
+	printFormat := process.Wrapper(req.Format)
 
-	w.Header().Set("Content-type", "application/json")
+	// call existing library to produce ASCII
+	result := print.AsciiArt(req.Text, printFormat)
+
 	w.WriteHeader(http.StatusOK)
-	fmt.Println("INFO:		status code = ", http.StatusOK)
-
-	// print to web console
-	result := print.AsciiArt(data, printFormat)
-	json.NewEncoder(w).Encode(map[string]string{"message": result})
+	_ = json.NewEncoder(w).Encode(map[string]string{"message": result})
+	log.Println("INFO: successfully processed request, Status code:", http.StatusOK)
 }
 
 func main() {
 	http.HandleFunc("/", asciiWeb)
 	http.HandleFunc("/test", testHandler)
-	fmt.Println("INFO:		server running on port 8000, check http://localhost:8000/")
+	fmt.Println("INFO: server running on port 8000, check http://localhost:8000/")
 	log.Fatal(http.ListenAndServe(":8000", nil))
 }

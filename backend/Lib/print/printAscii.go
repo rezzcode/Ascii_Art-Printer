@@ -9,10 +9,11 @@ func indexToPrint(r rune) int {
 	return int(r - 32)
 }
 
-func AsciiArt(data string, dataList [][][]rune) {
+func AsciiArt(data string, dataList [][][]rune) string {
 	data = strings.ReplaceAll(data, "\\n", "\n")
 	lines := strings.Split(data, "\n")
 	height := len(dataList[0])
+	res := ""
 
 	for _, line := range lines {
 		rows := make([][]rune, height)
@@ -31,7 +32,8 @@ func AsciiArt(data string, dataList [][][]rune) {
 		}
 
 		for _, row := range rows {
-			fmt.Println(string(row))
+			// fmt.Println(string(row)) uncomment to print to the terminal
+			res += string(row) + "\n"
 		}
 		/**
 		if endLine < len(lines)-2 {
@@ -39,4 +41,5 @@ func AsciiArt(data string, dataList [][][]rune) {
 		}
 		**/
 	}
+	return res
 }

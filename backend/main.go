@@ -2,28 +2,44 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	//"strconv"
+	"encoding/json"
+	"log"
+	"net/http"
 
-	"ascii_art/Lib/process"
-	"ascii_art/Lib/check"
 	"ascii_art/Lib/print"
+	"ascii_art/Lib/process"
 )
 
-func main() {
-	input := os.Args
+func testHandler(w http.ResponseWriter, r *http.Request) {
+	/*
+		input := os.Args
 
-	fileName, data, err := check.Args(input)
+		fileName, data, err := check.Args(input)
 
-	if !err {
-		fmt.Println(data)
-		return
-	}
+		if !err {
+			fmt.Println(data)
+			return
+		}
+	*/
 	// still needs to be tested with a [[[],[]],[[],[]]]
-	// printFormat := Lib.Wrapper("standard.txt")
+	data := "T"
+	printFormat := process.Wrapper("standard.txt")
 
-	printFormat := process.Wrapper(fileName)
+	// printFormat := process.Wrapper(fileName)
 
-	print.AsciiArt(data, printFormat)
+	w.Header().Set("Content-type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	fmt.Println("INFO:		status code = ", http.StatusOK)
+
+	// print to web console
+	result := print.AsciiArt(data, printFormat)
+	json.NewEncoder(w).Encode(map[string]string{"message": result})
+}
+
+func main() {
+	http.HandleFunc("/", testHandler)
+	fmt.Println("INFO:		server running on port 8000")
+	log.Fatal(http.ListenAndServe(":8000", nil))
 }

@@ -62,7 +62,7 @@ func testHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.HandleFunc("/", asciiWeb)
-	http.HandleFunc("/test", testHandler)
+	http.HandleFunc("/ascii-art", testHandler)
 	fmt.Println("INFO: server running on port 8000, check http://localhost:8000/")
 	log.Fatal(http.ListenAndServe(":8000", nil))
 }

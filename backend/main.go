@@ -12,6 +12,13 @@ import (
 	"ascii_art/Lib/process"
 )
 
+type RequestData struct {
+	Text string `json:"string"`
+	Font string `json:"font"`
+}
+
+
+
 /*
 
 func errorCheck(err error) {

@@ -14,10 +14,10 @@ func AsciiArt(data string, dataList [][][]rune) string {
 	data = strings.ReplaceAll(data, "\\n", "\n")
 	lines := strings.Split(data, "\n")
 
+
 	if len(dataList) == 0 {
     log.Fatal("ERROR: dataList is empty. Cannot generate ASCII art.")
 }
-
 	
 	height := len(dataList[0])
 	res := ""

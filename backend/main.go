@@ -12,6 +12,23 @@ import (
 	"ascii_art/Lib/process"
 )
 
+/*
+
+func errorCheck(err error) {
+	if err != nil {
+		log.Fatal("ERROR:	", err)
+	}
+}
+*/
+
+func stringCheck(s string) {
+	if s == "" {
+		log.Fatal("ERROR:		input string is empty")
+		return
+	}
+	log.Println("INFO:		input string is valid")
+}
+
 func testHandler(w http.ResponseWriter, r *http.Request) {
 	/*
 		input := os.Args
@@ -25,6 +42,12 @@ func testHandler(w http.ResponseWriter, r *http.Request) {
 	*/
 	// still needs to be tested with a [[[],[]],[[],[]]]
 	data := "T"
+
+	// check if string is empty
+	stringCheck(data)
+
+	// choose print format
+
 	printFormat := process.Wrapper("standard.txt")
 
 	// printFormat := process.Wrapper(fileName)

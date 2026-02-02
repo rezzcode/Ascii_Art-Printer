@@ -12,13 +12,6 @@ import (
 	"ascii_art/Lib/process"
 )
 
-type RequestData struct {
-	Text string `json:"text"`
-	Font string `json:"font"`
-}
-
-
-
 /*
 
 func errorCheck(err error) {
@@ -36,54 +29,45 @@ func stringCheck(s string) {
 	log.Println("INFO:		input string is valid")
 }
 
-func testHandler(w http.ResponseWriter, r *http.Request) {
-    // Allow any origin (for dev purposes)
-    w.Header().Set("Access-Control-Allow-Origin", "*")
-    w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-    w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
-
-    // Handle preflight request
-    if r.Method == http.MethodOptions {
-        w.WriteHeader(http.StatusOK)
-        return
-    }
-
-    if r.Method != http.MethodPost {
-        http.Error(w, "Only POST allowed", http.StatusMethodNotAllowed)
-        return
-    }
-
-    var req RequestData
-    err := json.NewDecoder(r.Body).Decode(&req)
-    if err != nil {
-        http.Error(w, "Invalid JSON", http.StatusBadRequest)
-        return
-    }
-
-    if req.Text == "" {
-        http.Error(w, "Text cannot be empty", http.StatusBadRequest)
-        return
-    }
-
-    fontFile := req.Font
-    if fontFile == "" {
-        fontFile = "standard.txt"
-    }
-
-    printFormat := process.Wrapper(fontFile)
-    if printFormat == nil || len(printFormat) == 0 {
-        http.Error(w, "Failed to load font", http.StatusInternalServerError)
-        return
-    }
-
-    result := print.AsciiArt(req.Text, printFormat)
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(map[string]string{"message": result})
+func asciiWeb(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "../frontend/index.html")
 }
 
+func testHandler(w http.ResponseWriter, r *http.Request) {
+	/*
+		input := os.Args
+
+		fileName, data, err := check.Args(input)
+
+		if !err {
+			fmt.Println(data)
+			return
+		}
+	*/
+	// still needs to be tested with a [[[],[]],[[],[]]]
+	data := "T"
+
+	// check if string is empty
+	stringCheck(data)
+
+	// choose print format
+
+	printFormat := process.Wrapper("standard.txt")
+
+	// printFormat := process.Wrapper(fileName)
+
+	w.Header().Set("Content-type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	fmt.Println("INFO:		status code = ", http.StatusOK)
+
+	// print to web console
+	result := print.AsciiArt(data, printFormat)
+	json.NewEncoder(w).Encode(map[string]string{"message": result})
+}
 
 func main() {
-	http.HandleFunc("/", testHandler)
-	fmt.Println("INFO:		server running on port 8000")
+	http.HandleFunc("/", asciiWeb)
+	http.HandleFunc("/test", testHandler)
+	fmt.Println("INFO:		server running on port 8000, check http://localhost:8000/")
 	log.Fatal(http.ListenAndServe(":8000", nil))
 }

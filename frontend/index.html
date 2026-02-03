@@ -6,9 +6,149 @@
   <title>ASCII Art Web</title>
   <style>
 
-    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 1rem; }
-    #output { white-space: pre; background:#111; color:#0f0; padding:1rem; border-radius:6px; min-height:8rem; }
-    label, button { margin-top: .5rem; display:block; }
+/* Theme variables */
+:root{
+  --bg-1: #0f1724;
+  --bg-2: #071028;
+  --panel: #0b1220;
+  --accent: #7ee787;
+  --muted: #9aa5b1;
+  --glass: rgba(255,255,255,0.03);
+  --radius: 10px;
+  --transition: 180ms ease;
+}
+
+/* Reset */
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+
+/* Layout */
+body{
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
+  color: #e6eef6;
+  padding: 2.25rem;
+}
+
+
+/* Heading */
+h1{
+  margin:0 0 .5rem 0;
+  font-size:1.6rem;
+  letter-spacing:0.4px;
+  color: #f1f9f2;
+}
+
+/* Form layout */
+label{ display:block; font-size:0.95rem; color:var(--muted); margin-top:.6rem; }
+input[type="text"]{
+  width:100%;
+  padding:.5rem .6rem;
+  margin-top:.35rem;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,0.06);
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+  color: #e6eef6;
+  outline: none;
+  transition: box-shadow var(--transition), border-color var(--transition);
+}
+input[type="text"]:focus{
+  box-shadow: 0 0 0 4px rgba(126,231,135,0.06);
+  border-color: var(--accent);
+}
+
+/* Fieldset */
+fieldset{
+  margin-top: .9rem;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,0.04);
+  padding: .8rem;
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+}
+fieldset legend{ font-weight:600; color:var(--muted); font-size:.95rem; }
+
+/* Radio group */
+fieldset > div:first-of-type{
+  display:flex;
+  gap:1rem;
+  align-items:center;
+  flex-wrap:wrap;
+  margin-top:.6rem;
+}
+input[type="radio"]{
+  accent-color: var(--accent);
+  width:1.05rem;
+  height:1.05rem;
+  margin-right:.25rem;
+}
+label[for^="contactChoice"]{
+  display:flex;
+  align-items:center;
+  gap:.35rem;
+  background: var(--glass);
+  padding:.35rem .6rem;
+  border-radius:7px;
+  color:#cfe9d3;
+  font-weight:600;
+  cursor:pointer;
+}
+
+/* Buttons */
+button{
+  appearance:none;
+  border: none;
+  cursor: pointer;
+  font-weight:600;
+  color:#071021;
+  background: linear-gradient(180deg, var(--accent), #4ac66b);
+  padding: .55rem .9rem;
+  border-radius:8px;
+  transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition);
+  box-shadow: 0 6px 18px rgba(10,20,12,0.18);
+  margin-top:.6rem;
+  display:inline-block;
+}
+button:hover{ transform: translateY(-2px); }
+button:active{ transform: translateY(0); opacity:.95; }
+button[type="submit"]{
+  background: linear-gradient(180deg, #6aa6ff, #3e87ff);
+  color: white;
+}
+
+/* Generate button */
+#generate{
+  margin-top: 1rem;
+}
+
+/* Small helper */
+small{ color:var(--muted); display:block; margin-top:.35rem; }
+
+/* Responsive */
+@media (max-width:640px){
+  .container{ padding:1rem; }
+  h1{ font-size:1.25rem; }
+  fieldset > div:first-of-type{ gap:.5rem; }
+  input[type="text"]{ font-size:.95rem; }
+}
+#output { white-space: pre; background:#111; color:#0f0; padding:1rem; border-radius:6px; min-height:8rem; }
+textarea {
+  width: 100%;
+  padding: .5rem .6rem;
+  margin-top: .35rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(255, 255, 255, 0.00));
+  color: #e6eef6;
+  outline: none;
+  transition: box-shadow var(--transition), border-color var(--transition);
+  font-family: inherit;
+  font-size: 1rem;
+  resize: vertical;
+}
+textarea:focus {
+  box-shadow: 0 0 0 4px rgba(126, 231, 135, 0.06);
+  border-color: var(--accent);
+}
   </style>
 </head>
 <body>
@@ -16,7 +156,7 @@
 
   <label for="message">Your Message:</label>
     <textarea id="text" type="text" name="message" rows="5" cols="30">
-    Write your message here...
+   
     </textarea>
   </label>
 

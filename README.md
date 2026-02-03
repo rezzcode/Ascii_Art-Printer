@@ -1,7 +1,7 @@
 # Ascii Web Art
 
 
-a website that prints your text in an ascii representable characters
+Ascii web Art is a web based application written in Go that transforms input text into artistic ASCII renditions. It allows users to convert strings into stylized ASCII art using predefined fonts, providing a fun and creative way to display text in the web.
 
 
 ## Authors

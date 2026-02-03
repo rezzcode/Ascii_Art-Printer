@@ -1,10 +1,8 @@
 package main
 
 import (
-	"fmt"
-
-	//"strconv"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -12,78 +10,68 @@ import (
 	"ascii_art/Lib/process"
 )
 
-type RequestData struct {
-	Text string `json:"text"`
-	Font string `json:"font"`
+type asciiRequest struct {
+	Text   string `json:"text"`
+	Format string `json:"format"`
 }
 
-
-
-/*
-
-func errorCheck(err error) {
-	if err != nil {
-		log.Fatal("ERROR:	", err)
-	}
-}
-*/
-
-func stringCheck(s string) {
-	if s == "" {
-		log.Fatal("ERROR:		input string is empty")
+func asciiWeb(w http.ResponseWriter, r *http.Request) {
+	filePath := "../frontend/index.html"
+	http.ServeFile(w, r, filePath)
+	if r.URL.Path != "/" || r.Method != http.MethodGet {
+		log.Println("ERROR: file not found, Status code:", http.StatusNotFound)
 		return
 	}
-	log.Println("INFO:		input string is valid")
 }
 
 func testHandler(w http.ResponseWriter, r *http.Request) {
-    // Allow any origin (for dev purposes)
-    w.Header().Set("Access-Control-Allow-Origin", "*")
-    w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-    w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+	w.Header().Set("Content-Type", "application/json")
 
-    // Handle preflight request
-    if r.Method == http.MethodOptions {
-        w.WriteHeader(http.StatusOK)
-        return
-    }
+	var req asciiRequest
 
-    if r.Method != http.MethodPost {
-        http.Error(w, "Only POST allowed", http.StatusMethodNotAllowed)
-        return
-    }
+	if r.Method == http.MethodPost {
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid JSON body"})
+			log.Println("ERROR: invalid JSON body:", err, "Status code:", http.StatusBadRequest)
+			return
+		}
+	} else {
+		// Allow simple GET fallback via query params: /test?text=Hi&format=standard.txt
+		req.Text = r.URL.Query().Get("text")
+		req.Format = r.URL.Query().Get("format")
+	}
 
-    var req RequestData
-    err := json.NewDecoder(r.Body).Decode(&req)
-    if err != nil {
-        http.Error(w, "Invalid JSON", http.StatusBadRequest)
-        return
-    }
+	if req.Text == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "text is required"})
+		log.Println("ERROR: text is required, Status code:", http.StatusBadRequest)
+		return
+	}
 
-    if req.Text == "" {
-        http.Error(w, "Text cannot be empty", http.StatusBadRequest)
-        return
-    }
+	if req.Format == "" {
+		req.Format = "standard.txt"
+	}
 
-    fontFile := req.Font
-    if fontFile == "" {
-        fontFile = "standard.txt"
-    }
+	log.Println("OPTIONS: received request", "text = ", req.Text, "format = ", req.Format)
 
-    printFormat := process.Wrapper(fontFile)
-    if printFormat == nil || len(printFormat) == 0 {
-        http.Error(w, "Failed to load font", http.StatusInternalServerError)
-        return
-    }
+	printFormat := process.Wrapper(req.Format)
+	if len(printFormat) == 0 {
+		log.Println("ERROR: Failed to load font format", http.StatusInternalServerError)
+		return
+	}
 
-    result := print.AsciiArt(req.Text, printFormat)
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(map[string]string{"message": result})
+	// call existing library to produce ASCII
+	result := print.AsciiArt(req.Text, printFormat)
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string]string{"message": result})
+	log.Println("INFO: successfully processed request, Status code:", http.StatusOK)
 }
 
-
 func main() {
-	http.HandleFunc("/", testHandler)
-	fmt.Println("INFO:		server running on port 8000")
+	http.HandleFunc("/", asciiWeb)
+	http.HandleFunc("/ascii-art", testHandler)
+	fmt.Println("INFO: server running on port 8000, check http://localhost:8000/")
 	log.Fatal(http.ListenAndServe(":8000", nil))
 }

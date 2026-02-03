@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>404 — Page Not Found</title>
+    <style>
+        :root {
+            --bg: #f7fafc;
+            --card: #ffffff;
+            --muted: #546170;
+            --accent: #2563eb;
+        }
+        html,body {
+            height: 100%;
+            margin: 0;
+            font-family: system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+            background: linear-gradient(180deg, var(--bg), #ffffff);
+            color: #0f172a;
+        }
+        .container {
+            min-height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 16px;
+            box-sizing: border-box;
+        }
+        .card {
+            text-align: center;
+            background: var(--card);
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 6px 30px rgba(15,23,42,0.08);
+            max-width: 760px;
+            width: 100%;
+        }
+        h1 {
+            margin: 0 0 8px 0;
+            font-size: 48px;
+            line-height: 1;
+        }
+        p.lead {
+            margin: 0 0 20px 0;
+            color: var(--muted);
+            font-size: 16px;
+        }
+        img.illustration {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 18px 0;
+        }
+        .actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 8px;
+        }
+        a.button {
+            display: inline-block;
+            padding: 10px 16px;
+            background: var(--accent);
+            color: #fff;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        a.button.secondary {
+            background: transparent;
+            border: 1px solid #e6eefc;
+            color: var(--accent);
+            font-weight: 600;
+        }
+        a.button:focus {
+            outline: 3px solid rgba(37,99,235,0.2);
+            outline-offset: 2px;
+        }
+        footer {
+            margin-top: 16px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+    </style>
+</head>
+<body>
+    <main class="container" role="main">
+        <div class="card" role="article" aria-labelledby="title-404">
+            <h1 id="title-404">404</h1>
+            <p class="lead">Page not found — the resource you're looking for doesn't exist.</p>
+
+            <img
+                class="illustration"
+                src="https://httpcats.com/404.jpg"
+                alt="A cat representing 404 Not Found"
+                loading="lazy"
+            />
+
+            <div class="actions" role="navigation" aria-label="404 actions">
+                <a class="button" href="/">Go to Home</a>
+            </div>
+
+            <footer>
+                If you think this is a bug, please let us know.
+            </footer>
+        </div>
+    </main>
+</body>
+</html>

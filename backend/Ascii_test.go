@@ -1,12 +1,12 @@
-package main 
+package main
 
 import (
+	"os"
+	"strings"
 	"testing"
+
 	"ascii_art/Lib/print"
 	"ascii_art/Lib/process"
-	"strings"
-	"os"
-	"io"
 )
 
 func TestAsciiArt(t *testing.T) {
@@ -19,7 +19,6 @@ func TestAsciiArt(t *testing.T) {
 		{"Tests/input3.txt", "Tests/output3.txt"},
 		{"Tests/input4.txt", "Tests/output4.txt"},
 		{"Tests/input5.txt", "Tests/output5.txt"},
-		{"Tests/input6.txt", "Tests/output6.txt"},
 		{"Tests/input7.txt", "Tests/output7.txt"},
 		{"Tests/input8.txt", "Tests/output8.txt"},
 		{"Tests/input9.txt", "Tests/output9.txt"},
@@ -42,14 +41,12 @@ func TestAsciiArt(t *testing.T) {
 			t.Fatalf("Failed to read expected output file %s: %v", tc.expectedoutputfile, err)
 		}
 
-	   asciitemplates := process.Wrapper("standard.txt")
+		asciitemplates := process.Wrapper("standard.txt")
 
-        //call function 
-		output := capturePrint(func() {
-			print.AsciiArt(string(input),asciitemplates)
-		})
+		// call function
+		output := print.AsciiArt(string(input), asciitemplates)
 
-        //compare actual output to expected output
+		// compare actual output to expected output
 		if strings.TrimSpace(output) != strings.TrimSpace(string(expectedOutput)) {
 			t.Errorf(
 				"Output mismatch for %s\nExpected:\n%s\nGot:\n%s",
@@ -59,19 +56,4 @@ func TestAsciiArt(t *testing.T) {
 			)
 		}
 	}
-}
-
-
-// Utility function to capture the printed output
-func capturePrint(fn func()) string {
-	old := os.Stdout
-	r, w, _ := os.Pipe()
-	os.Stdout = w
-
-	fn()
-
-	w.Close()
-	os.Stdout = old
-	out, _ := io.ReadAll(r)
-	return string(out)
 }

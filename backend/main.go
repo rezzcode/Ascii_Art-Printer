@@ -2,28 +2,15 @@ package main
 
 import (
 	"fmt"
-	"os"
-
-	//"strconv"
+	"log"
+	"net/http"
 
 	"ascii_art/Lib/process"
-	"ascii_art/Lib/check"
-	"ascii_art/Lib/print"
 )
 
 func main() {
-	input := os.Args
-
-	fileName, data, err := check.Args(input)
-
-	if !err {
-		fmt.Println(data)
-		return
-	}
-	// still needs to be tested with a [[[],[]],[[],[]]]
-	// printFormat := Lib.Wrapper("standard.txt")
-
-	printFormat := process.Wrapper(fileName)
-
-	print.AsciiArt(data, printFormat)
+	http.HandleFunc("/", process.AsciiWeb)
+	http.HandleFunc("/ascii-art", process.TestHandler)
+	fmt.Println("INFO: server running on port 8000, check http://localhost:8000/")
+	log.Fatal(http.ListenAndServe(":8000", nil))
 }

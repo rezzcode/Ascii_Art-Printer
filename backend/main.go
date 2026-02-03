@@ -56,6 +56,10 @@ func testHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("OPTIONS: received request", "text = ", req.Text, "format = ", req.Format)
 
 	printFormat := process.Wrapper(req.Format)
+	if len(printFormat) == 0 {
+		log.Println("ERROR: Failed to load font format", http.StatusInternalServerError)
+		return
+	}
 
 	// call existing library to produce ASCII
 	result := print.AsciiArt(req.Text, printFormat)

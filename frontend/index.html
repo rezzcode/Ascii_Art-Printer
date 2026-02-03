@@ -4,8 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>ASCII Art Web</title>
-  <link rel="stylesheet" href="style.css" />
   <style>
+
     body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 1rem; }
     #output { white-space: pre; background:#111; color:#0f0; padding:1rem; border-radius:6px; min-height:8rem; }
     label, button { margin-top: .5rem; display:block; }
@@ -14,9 +14,10 @@
 <body>
   <h1>ASCII Art</h1>
 
-  <label>
-    Text:
-    <input id="text" type="text" value="Input your text here" />
+  <label for="message">Your Message:</label>
+    <textarea id="text" type="text" name="message" rows="5" cols="30">
+    Write your message here...
+    </textarea>
   </label>
 
   <fieldset>
@@ -30,9 +31,6 @@
 
       <input type="radio" id="contactChoice3" name="format" value="thinkertoy.txt" />
       <label for="contactChoice3">Thinkertoy</label>
-    </div>
-    <div>
-      <button type="submit">Submit</button>
     </div>
   </fieldset>
 

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ASCII Art Web</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 1rem; }
+    #output { white-space: pre; background:#111; color:#0f0; padding:1rem; border-radius:6px; min-height:8rem; }
+    label, button { margin-top: .5rem; display:block; }
+  </style>
+</head>
+<body>
+  <h1>ASCII Art</h1>
+
+  <label>
+    Text:
+    <input id="text" type="text" value="Input your text here" />
+  </label>
+
+  <fieldset>
+    <legend>Please select your preferred printout format method:</legend>
+    <div>
+      <input type="radio" id="contactChoice1" name="format" value="shadow.txt" />
+      <label for="contactChoice1">Shadow</label>
+
+      <input type="radio" id="contactChoice2" name="format" value="standard.txt" checked />
+      <label for="contactChoice2">Standard</label>
+
+      <input type="radio" id="contactChoice3" name="format" value="thinkertoy.txt" />
+      <label for="contactChoice3">Thinkertoy</label>
+    </div>
+    <div>
+      <button type="submit">Submit</button>
+    </div>
+  </fieldset>
+
+  <button id="generate">Generate</button>
+
+  <h2>Result</h2>
+  <pre id="output">Click "Generate" to call /test</pre>
+
+  <script>
+    const btn = document.getElementById('generate');
+    const out = document.getElementById('output');
+    const input = document.getElementById('text');
+
+    btn.addEventListener('click', async () => {
+      out.textContent = 'Loading...';
+      try {
+        const selected = document.querySelector('input[name="format"]:checked');
+        const format = selected ? selected.value : 'standard.txt';
+
+        const payload = {
+          text: input.value || '',
+          format: format
+        };
+
+        const res = await fetch('/ascii-art', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const errJson = await res.json().catch(() => ({}));
+          throw new Error(errJson.error || res.status + ' ' + res.statusText);
+        }
+
+        const json = await res.json();
+        out.textContent = json.message || 'No message returned';
+      } catch (err) {
+        out.textContent = 'Error: ' + err.message;
+      }
+    });
+  </script>
+</body>
+</html>

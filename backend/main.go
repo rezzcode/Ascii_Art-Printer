@@ -20,6 +20,7 @@ func asciiWeb(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" || r.Method != http.MethodGet {
 		filePath = "../frontend/404.html"
 		http.ServeFile(w, r, filePath)
+		http.NotFound(w, r)
 		log.Println("ERROR: file not found, Status code:", http.StatusNotFound)
 		return
 	}
@@ -35,6 +36,7 @@ func testHandler(w http.ResponseWriter, r *http.Request) {
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid JSON body"})
+			http.Error(w, "Invalid JSON body", http.StatusBadRequest)
 			log.Println("ERROR: invalid JSON body:", err, "Status code:", http.StatusBadRequest)
 			return
 		}
@@ -47,6 +49,7 @@ func testHandler(w http.ResponseWriter, r *http.Request) {
 	if req.Text == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode(map[string]string{"error": "text is required"})
+		http.Error(w, "Text is required", http.StatusBadRequest)
 		log.Println("ERROR: text is required, Status code:", http.StatusBadRequest)
 		return
 	}
@@ -59,6 +62,7 @@ func testHandler(w http.ResponseWriter, r *http.Request) {
 
 	printFormat := process.Wrapper(req.Format)
 	if len(printFormat) == 0 {
+		w.WriteHeader(http.StatusInternalServerError)
 		log.Println("ERROR: Failed to load font format", http.StatusInternalServerError)
 		return
 	}

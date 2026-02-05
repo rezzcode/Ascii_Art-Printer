@@ -86,10 +86,15 @@ func TestHandler(w http.ResponseWriter, r *http.Request) {
 		switch err {
 		case ErrBadRequest:
 			http.Error(w, err.Error(), http.StatusBadRequest)
+			log.Println("Status Bad Request",http.StatusBadRequest)
 		case ErrInvalidFormat:
 			http.Error(w, err.Error(), http.StatusNotFound)
+			log.Println("Status not found",http.StatusNotFound)
+
 		default:
 			http.Error(w, "internal server error", http.StatusInternalServerError)
+			log.Println("Internal server error",http.StatusInternalServerError)
+
 		}
 		return
 	}

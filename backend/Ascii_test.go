@@ -6,7 +6,6 @@ import (
 	"ascii_art/Lib/process"
 	"strings"
 	"os"
-	"io"
 )
 
 func TestAsciiArt(t *testing.T) {
@@ -31,47 +30,35 @@ func TestAsciiArt(t *testing.T) {
 		{"Tests/input15.txt", "Tests/output15.txt"},
 	}
 
+	// Load templates once outside the loop for better performance
+	asciitemplates := process.Wrapper("standard.txt")
+
 	for _, tc := range testCases {
+		// Read input
 		input, err := os.ReadFile(tc.inputfile)
 		if err != nil {
 			t.Fatalf("Failed to read input file %s: %v", tc.inputfile, err)
 		}
 
+		// Read expected output
 		expectedOutput, err := os.ReadFile(tc.expectedoutputfile)
 		if err != nil {
 			t.Fatalf("Failed to read expected output file %s: %v", tc.expectedoutputfile, err)
 		}
 
-	   asciitemplates := process.Wrapper("standard.txt")
+		// CALL FUNCTION DIRECTLY (No more capturePrint needed!)
+		// We convert input to string and pass templates
+		output := print.AsciiArt(string(input), asciitemplates)
 
-        //call function 
-		output := capturePrint(func() {
-			print.AsciiArt(string(input),asciitemplates)
-		})
-
-        //compare actual output to expected output
+		// Compare actual output to expected output
+		// Using TrimRight avoids issues with trailing empty lines often found in text files
 		if strings.TrimSpace(output) != strings.TrimSpace(string(expectedOutput)) {
 			t.Errorf(
 				"Output mismatch for %s\nExpected:\n%s\nGot:\n%s",
 				tc.inputfile,
-				expectedOutput,
+				string(expectedOutput),
 				output,
 			)
 		}
 	}
-}
-
-
-// Utility function to capture the printed output
-func capturePrint(fn func()) string {
-	old := os.Stdout
-	r, w, _ := os.Pipe()
-	os.Stdout = w
-
-	fn()
-
-	w.Close()
-	os.Stdout = old
-	out, _ := io.ReadAll(r)
-	return string(out)
 }

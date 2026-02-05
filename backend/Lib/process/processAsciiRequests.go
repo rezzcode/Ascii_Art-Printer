@@ -21,10 +21,6 @@ var (
 	ErrInternalFailure = errors.New("internal failure")
 )
 
-
-// ================= LOGIC LAYER =================
-// NO http.ResponseWriter
-// NO *http.Request
 func asciiLogic(req asciiRequest) (string, error) {
 	if req.Text == "" {
 		return "", ErrBadRequest
@@ -47,29 +43,64 @@ func asciiLogic(req asciiRequest) (string, error) {
 	return result, nil
 }
 
+func AsciiRequest(r *http.Request) (int, string, error) {
+	var req asciiRequest
+
+	if r.Method == http.MethodPost {
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			log.Println("[ Status: ", http.StatusBadRequest, "] ERROR: invalid JSON body:", err)
+			return http.StatusBadRequest, "", ErrBadRequest
+		}
+	} else {
+		req.Text = r.URL.Query().Get("text")
+		req.Format = r.URL.Query().Get("format")
+	}
+
+	if req.Text == "" {
+		log.Println("[ Status: ", http.StatusBadRequest, "] ERROR: no text provided")
+		return http.StatusBadRequest, "", ErrBadRequest
+	}
+
+	if req.Format == "" {
+		req.Format = "standard.txt"
+	}
+
+	printFormat := Wrapper(req.Format)
+	if len(printFormat) == 0 {
+		log.Println("[ Status: ", http.StatusInternalServerError, "] ERROR: failed to load font format")
+		return http.StatusInternalServerError, "", ErrInvalidFormat
+	}
+
+	result := print.AsciiArt(req.Text, printFormat)
+	if result == "" {
+		return http.StatusInternalServerError, "", ErrInternalFailure
+	}
+	return http.StatusOK, result, nil
+}
 
 func AsciiWeb(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" || r.Method != http.MethodGet {
 		http.ServeFile(w, r, "../frontend/404.html")
-		log.Println("[404] invalid path or method")
+		log.Println("[ Status: ", http.StatusNotFound, "] ERROR: invalid request path or method")
 		return
 	}
 
 	http.ServeFile(w, r, "../frontend/index.html")
 }
 
-
 func TestHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	if r.Method != http.MethodPost {
 		http.Error(w, "POST method required", http.StatusBadRequest)
+		log.Println("[ Status: ", http.StatusBadRequest, "] ERROR: POST method required")
 		return
 	}
 
 	var req asciiRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "invalid JSON body", http.StatusBadRequest)
+		log.Println("[ Status: ", http.StatusBadRequest, "] ERROR: invalid JSON body:", err)
 		return
 	}
 
@@ -77,7 +108,7 @@ func TestHandler(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		if rec := recover(); rec != nil {
 			http.Error(w, "internal server error", http.StatusInternalServerError)
-			log.Println("[500] panic:", rec)
+			log.Println("[ Status: ", http.StatusInternalServerError, "] ERROR: internal server error:", rec)
 		}
 	}()
 
@@ -86,15 +117,14 @@ func TestHandler(w http.ResponseWriter, r *http.Request) {
 		switch err {
 		case ErrBadRequest:
 			http.Error(w, err.Error(), http.StatusBadRequest)
-			log.Println("Status Bad Request",http.StatusBadRequest)
+			log.Println("[ Status: ", http.StatusBadRequest, "] ERROR: bad request")
 		case ErrInvalidFormat:
 			http.Error(w, err.Error(), http.StatusNotFound)
-			log.Println("Status not found",http.StatusNotFound)
+			log.Println("[ Status: ", http.StatusNotFound, "] ERROR: invalid format")
 
 		default:
 			http.Error(w, "internal server error", http.StatusInternalServerError)
-			log.Println("Internal server error",http.StatusInternalServerError)
-
+			log.Println("[ Status: ", http.StatusInternalServerError, "] ERROR: internal server error:", err)
 		}
 		return
 	}
@@ -104,5 +134,5 @@ func TestHandler(w http.ResponseWriter, r *http.Request) {
 		"message": result,
 	})
 
-	log.Println("[200] ASCII generated successfully")
+	log.Println("[ Status: ", http.StatusOK, "] INFO: ASCII art generated successfully")
 }

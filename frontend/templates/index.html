@@ -1,0 +1,27 @@
+{{define "title"}}A templated page{{end}} {{define "body"}}
+<form action="/backend" method="post">
+    <div class="buttons">
+        <input 
+        type="radio"
+        id="Standard"
+        name="backend"
+        value="standard"
+        checked
+        />
+        <label for="Standard">Standard</label><br />
+        <input type="radio" id="Thinkertoy" name="backend" value="thinkertoy" />
+        <label for="Thinkertoy">Thinkertoy</label><br />
+        <input type="radio" id="Shadow" name="backend" value="shadow" />
+        <label for="Shadow">Shadow</label><br />
+    </div>
+    <div class="textareagenerate">
+        <textarea id="Usertext" name="text" placeholder="Type your text here..." required></textarea>
+        <input type="submit" value="Generate" />
+    </div>
+</form>
+
+<!-- display the generaed ascii art result-->
+ <div class="asciioutput">
+    <pre>{{.ASCIIArtResult}}</pre>
+ </div>
+ {{end}}
